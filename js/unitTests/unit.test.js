@@ -1,1 +1,1 @@
-const module = require("../module/module.js");
+const module = require("../module/GeneralEventTarget.js");
