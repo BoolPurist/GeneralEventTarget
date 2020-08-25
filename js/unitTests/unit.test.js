@@ -1,5 +1,10 @@
 "use strict";
-const { GeneralEventTarget, GeneralEvent, CallbackReport } = require("../module/GeneralEventTarget.js");
+// @ts-check
+const { 
+    GeneralEventTarget, GeneralEvent, CallbackReport, CallbackInvocation 
+} = require("../module/GeneralEventTarget.js");
+
+const { Test, TestPerson } = require("../module/TestPerson.js");
 
 describe(
     `
@@ -32,6 +37,32 @@ Testing module GeneralEventTarget
                 }
             );
 
+        }
+          
+    );
+
+    describe(
+        `
+        Testing class GeneralEventTarget 
+        `, () => {
+            
+
+            test(
+                `
+                Testing addEventHandler and fireEvent  
+                `, () => {
+                    let person = new TestPerson(3, "Flo");
+
+                    person.addEventHandler("click", () => {
+                        return true;
+                    });
+
+
+                }
+            );
+
+
+            
 
         }
     );
