@@ -13,36 +13,24 @@ class GeneralEvent {
          */
         this.publisher = publisher;
         /**
-         * @type {?string}
-         */
-        this.dataType = GeneralEvent.getDataType(this.publisher);
+         * @type {!object}
+         */ 
+        this.listener = null;   
         /**
          * @type {Array<any>}
          */
-    
-        this.args = args;
-        console.log(args);
+        this.args = args;        
         /**
          * @type {!boolean}
          */
         this.hasArgs = this.args !== null && args.length !== 0;
         /**
-         * @type {?CallbackReport}
+         * @type {Array<any>}
          */
-        this.eventResult = null;
+        this.eventResults = null;
     }
 
-    /**
-     * 
-     * @param {any} publisher
-     * @returns {?string} 
-     */
-    static getDataType(publisher) {
-        if (publisher === null) return publisher;
-        const primitiveType = typeof publisher;
-        if (primitiveType !== "object") return primitiveType;
-        else return publisher.constructor.name;
-    }
+
 }
 
 class CallbackReport {
@@ -93,6 +81,8 @@ class GeneralEventTarget {
 
     }
 
+
+
     /**
      * 
      * @param {!string} eventType 
@@ -100,30 +90,27 @@ class GeneralEventTarget {
      * @returns {void}  
      */
     addEventHandler(eventType, callbackFunction) {
-        if (GeneralEventTarget.prototype._eventPool.has(eventType) === false) {
-            
-            const newInvocation = new CallbackInvocation(
-                this, callbackFunction
-            );
 
-            let newEventList = [newInvocation];
-            GeneralEventTarget.prototype._eventPool.set(eventType, newEventList);
-
-        } else {
-            const listeners = GeneralEventTarget.prototype._eventPool.get(eventType);
-            
-            const isAlreadyIn = listeners.some(element => 
-                element.listener === this && 
-                element.callbackFunction === callbackFunction  
-            );
-
-            if (isAlreadyIn === false) listeners.push(
-                new CallbackInvocation(
-                    this, callbackFunction
-                )
+        let listeners = GeneralEventTarget._eventPool.get(eventType);
+        
+        if (typeof listeners === "undefined") {
+            GeneralEventTarget._eventPool.set(
+                eventType, new Map().set(this, [callbackFunction])
             )
+        } else {            
+            let callbackFunctionList = listeners.get(this);
 
-        }
+            if (typeof callbackFunctionList === "undefined") {
+                listeners.set(this, [callbackFunction]);
+            } else if (
+                callbackFunctionList.some(
+                    oneCallbackFunction => 
+                    oneCallbackFunction === callbackFunction
+                    )    === false
+            ) {
+                callbackFunctionList.push(callbackFunction);
+            }
+        }        
     }
     /**
      * 
@@ -147,53 +134,69 @@ class GeneralEventTarget {
     /**
      * 
      * @param {!string} eventType 
-     * @param {!boolean} [returnCallbackData=false] 
-     * @param  {...any} [argsCallbackFunction]
-     * @returns {?CallbackReport} 
+     * @param  {...any} argsCallbackFunction 
+     * @returns {void}
      */
-    fireEvent(eventType, returnCallbackData = false, ...argsCallbackFunction) {
-        if (GeneralEventTarget.prototype._eventPool.has(eventType) === true) {
+    fireEvent(eventType, ...argsCallbackFunction) {
+        this._triggerEvent(eventType, false, argsCallbackFunction);        
+    }
 
-            const listeners = GeneralEventTarget.prototype._eventPool
-            .get(eventType);
-            
-            console.log();
-            
-            let event = null;
+    /**
+     * 
+     * @param {!string} eventType 
+     * @param  {...any} argsCallbackFunction 
+     * @returns {?Map<object,Array<any>>}
+     */
+    fireEventReturn(eventType, ...argsCallbackFunction) {
+        return this._triggerEvent(eventType, true, argsCallbackFunction);
+    }
 
-            if (argsCallbackFunction.length === 0) {
-                event = new GeneralEvent(this);
-            } else {
-                event = new GeneralEvent(this, argsCallbackFunction)
-            }
-            let callbackReport = null;
+    /**
+     * 
+     * @param {!string} eventType 
+     * @param {!boolean} [returnCallbackData=false] 
+     * @param  {Array<any>} [argsCallbackFunction]
+     * @returns {?Map<object,any>} 
+     */
+    _triggerEvent(eventType, returnCallbackData = false, argsCallbackFunction) {
+        let listeners = GeneralEventTarget._eventPool.get(eventType);
+        
+        if (typeof listeners !== "undefined") {
 
-            if (returnCallbackData === true) {                
-                let returnValues = listeners.map(
-                    element => element.callbackFunction
-                    .call(element.listener, event)                
-                );
-                let referencesOfListeners = listeners.map(
-                    element => element.listener
-                );
+            const eventObj = new GeneralEvent(this, argsCallbackFunction);
+
+            if (returnCallbackData === false) {
+                for (const [listener, callbackFunctionList] of listeners) {
                 
-                callbackReport = new CallbackReport(
-                    referencesOfListeners, returnValues
-                );
+                    callbackFunctionList.forEach(callbackFunction => {
+                            eventObj.listener = listener;
+                            callbackFunction.call(listener, eventObj);                    
+                        }
+                    );                                           
+                }
+    
+                return null;
+            } else {
+                let returnResults = new Map();
+                                
+                for (const [listener, callbackFunctionList] of listeners) {
+                    let resultList = [];
+                    returnResults.set(listener, resultList);
+                    callbackFunctionList.forEach( 
+                        (callbackFunction) => {
+                            eventObj.listener = listener;
+                            resultList.push(
+                                callbackFunction.call(listener, eventObj)
+                            );
+                        }
+                    );                                           
+                }
 
+                return returnResults;
             }
-            else {
-                listeners.forEach(element => {
-                    element.callbackFunction.call(element.listener, event);                
-                });
-            }
 
-            
-
-            return callbackReport;
-         
-
-        } else return null;
+                 
+        } else return null; 
     }
 
     /**
@@ -226,10 +229,12 @@ class GeneralEventTarget {
     }
 
     /**
+     * @static
+     * @function
      * @returns {void}
      */
-    static clearAllEvents() {
-
+    static clearAll() {
+        GeneralEventTarget._eventPool.clear();
     }
 
     /**
@@ -237,7 +242,7 @@ class GeneralEventTarget {
      * @type {IterableIterator}
      */
     static get eventTypes() {
-        return GeneralEventTarget.prototype._eventPool.keys();
+        return GeneralEventTarget._eventPool.keys();
     }
 
     /**
@@ -251,10 +256,12 @@ class GeneralEventTarget {
     
 }
 
-/**
- * @type {Map<!string,Array<!CallbackInvocation>>}
- */
-GeneralEventTarget.prototype._eventPool = new Map();
+
+    /**
+     * @static
+     * @type {Map<!string, Map<object, Array<Function> >>}
+     */
+    GeneralEventTarget._eventPool = new Map();
 
 
 

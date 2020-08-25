@@ -7,23 +7,43 @@ import { TestPerson } from "./module/TestPerson.js"
 
 window.addEventListener("DOMContentLoaded",() => {
 
-let eventTarget = new GeneralEventTarget();
-const eventType = "click";
+    const persons = [
+        new TestPerson("Flo"),
+        new TestPerson("Max"),
+        new TestPerson("Max"),
+        new TestPerson("Mix"),
+        new TestPerson("Yxx"),
+        new TestPerson("Max"),
+        new TestPerson("Max"),
+        new TestPerson("Macc"),
+        new TestPerson("Max"),
+        new TestPerson("Max"),
+    ];
 
-const person = new TestPerson(2, "Flo");
-
-const person2 = new TestPerson(3, "Max");
-person.addEventHandler(eventType, (eventSource) => {
-    return "a";
+    for (let i = 0; i < 3; i++) {
+        persons[i].addEventHandler("click", click);
+    }
+    for (let i = 4; i < 6; i++) {
+        persons[i].addEventHandler("press", press);
+    }
+    for (let i = 6; i < persons.length; i++) {
+        persons[i].addEventHandler("focus", focus);
+    }
 
     
-});
 
-console.log(person2.fireEvent(eventType, true, "Hello"));
-
-function Hello() {
-    console.log("Hello from here", );
-}
+    const eventPool = GeneralEventTarget._eventPool;
+    GeneralEventTarget.clearAll();
+    console.log(eventPool);
+    function click() {
+        return "click";
+    }
+    function press() {
+        return "press";
+    }
+    function focus() {
+        return "focus";
+    }
 
 });
 

@@ -3,11 +3,20 @@
 import { GeneralEventTarget } from "./GeneralEventTarget.js";
 
 class TestPerson extends GeneralEventTarget {
-    constructor(id, name) {
+    constructor(name) {
         super();
-        this.id = id;
+        TestPerson.id++;
+        this.id = TestPerson.id;
         this.name = name;
     }
+
+    
+
+    toString() {
+        return `Id: ${this.id}, Name: ${this.name}`;
+    }
 }
+
+TestPerson.id = 0;
 
 export { TestPerson };
