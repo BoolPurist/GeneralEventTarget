@@ -1,4 +1,12 @@
-import defaultPart from "./module/module.js";
+import * as events from "./module/GeneralEventTarget.js";
 
-console.log("Hello from javascript");
-console.log(defaultPart);
+window.addEventListener("DOMContentLoaded",() => {
+
+const generalEvent = new events.GeneralEvent(new Person("flo"), null);
+console.log(generalEvent.target);
+
+});
+
+function Person(name="person") {
+    this.name = name;
+}

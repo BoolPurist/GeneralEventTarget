@@ -7,7 +7,7 @@ class GeneralEvent {
      * @param {!object} target 
      * @param {...any} args 
      */
-    constructor(target, ...args) {
+    constructor(target, ...args) {        
         /**
          * @type {!object}
          */
@@ -15,7 +15,7 @@ class GeneralEvent {
         /**
          * @type {?string}
          */
-        this.dataType = GeneralEvent.GetDataType(this.target);
+        this.dataType = GeneralEvent.getDataType(this.target);
         /**
          * @type {Array<any>}
          */
@@ -25,7 +25,7 @@ class GeneralEvent {
          */
         this.hasArgs = this.args !== null && args.length !== 0;
         /**
-         * @type {?callbackReport}
+         * @type {?CallbackReport}
          */
         this.eventResult = null;
     }
@@ -35,7 +35,7 @@ class GeneralEvent {
      * @param {any} target
      * @returns {?string} 
      */
-    static GetDataType(target) {
+    static getDataType(target) {
         if (target === null) return target;
         const primitiveType = typeof target;
         if (primitiveType !== "object") return primitiveType;
@@ -43,20 +43,20 @@ class GeneralEvent {
     }
 }
 
-class callbackReport {
+class CallbackReport {
     
     /**
      * 
-     * @param {Array<!object>} listeners 
-     * @param {Array<any>} returnValues
+     * @param {object} listener 
+     * @param {?Array<any>} [returnValues=null]
      */
-    constructor(listeners, returnValues) {
+    constructor(listener, returnValues = null) {
         /**
-         * @type {Array<!object>}
+         * @type {object}
          */
-        this._listeners = listeners;
+        this._listener = listener;
         /**
-         * @type {Array<any>}
+         * @type {?Array<any>}
          */
         this._returnValues = returnValues;
     }
@@ -177,6 +177,8 @@ class GeneralEventTarget {
     static getListeners(eventType) {
 
     }
+
+    
 }
 
 /**
@@ -188,4 +190,4 @@ GeneralEventTarget.prototype._eventPool = new Map();
 
 
 
-export  { GeneralEventTarget };
+export  { GeneralEventTarget, GeneralEvent, CallbackReport };
