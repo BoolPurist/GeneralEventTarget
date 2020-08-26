@@ -1,80 +1,5 @@
 // @ts-check
 
-class GeneralEvent {
-
-    /**
-     * 
-     * @param {!object} publisher 
-     * @param {?Array<any>} args 
-     */
-    constructor(publisher, args=null) {        
-        /**
-         * @type {!object}
-         */
-        this.publisher = publisher;
-        /**
-         * @type {!object}
-         */ 
-        this.listener = null;   
-        /**
-         * @type {Array<any>}
-         */
-        this.args = args;        
-        /**
-         * @type {!boolean}
-         */
-        this.hasArgs = this.args !== null && args.length !== 0;
-        /**
-         * @type {Array<any>}
-         */
-        this.eventResults = null;
-    }
-
-
-}
-
-class CallbackReport {
-    
-    /**
-     * 
-     * @param {object} listeners
-     * @param {?Array<any>} [returnValues=null]
-     */
-    constructor(listeners, returnValues = null) {
-        /**
-         * @type {object}
-         */
-        this._listeners = listeners;
-        /**
-         * @type {?Array<any>}
-         */
-        this._returnValues = returnValues;
-        /**
-         * @type {!number}
-         */
-        this._invocations = returnValues === null ? 0 : returnValues.length;
-    }
-}
-
-class CallbackInvocation {
-    
-    /**
-     * 
-     * @param {!object} listener 
-     * @param {!Function} callbackFunction 
-     */
-    constructor (listener, callbackFunction) {
-        /**
-         * @type {!object}
-         */
-        this.listener = listener;
-        /**
-         * @type {!Function}
-         */
-        this.callbackFunction = callbackFunction;
-    }
-}
-
 class GeneralEventTarget {
 
     constructor() {
@@ -222,10 +147,10 @@ class GeneralEventTarget {
 
     /**
      * @param {!string} eventType
-     * @returns {void}
+     * @returns {!boolean}
      */
     static clearEvent(eventType) {
-
+        return GeneralEventTarget._eventPool.delete(eventType);
     }
 
     /**
@@ -263,10 +188,42 @@ class GeneralEventTarget {
      */
     GeneralEventTarget._eventPool = new Map();
 
+    class GeneralEvent {
+
+        /**
+         * 
+         * @param {!object} publisher 
+         * @param {?Array<any>} args 
+         */
+        constructor(publisher, args=null) {        
+            /**
+             * @type {!object}
+             */
+            this.publisher = publisher;
+            /**
+             * @type {!object}
+             */ 
+            this.listener = null;   
+            /**
+             * @type {Array<any>}
+             */
+            this.args = args;        
+            /**
+             * @type {!boolean}
+             */
+            this.hasArgs = this.args !== null && args.length !== 0;
+            /**
+             * @type {Array<any>}
+             */
+            this.eventResults = null;
+        }
+    
+    
+    }
 
 
 
 
 export  { 
-    GeneralEventTarget, GeneralEvent, CallbackReport, CallbackInvocation 
+    GeneralEventTarget
 };
