@@ -27,18 +27,24 @@ class Person extends GeneralEventTarget {
 
 window.addEventListener("DOMContentLoaded",() => {
 
-const person = new Person("Flo", 21);
+const max = new Person("max", 88);
+const flo = new Person("flo", 18);
 
-person.addEventHandler("from outside", function (event) {
-    // event.publisher.tagName = div.
-    console.log(`An ${event.publisher.tagName} element triggered me !`);
-});
 
-// A div element does not extend the class GeneralEventTarget 
-// So it fires from outside the event system.
-const objFromOutside = document.createElement("div");
-GeneralEventTarget.fireEventOut(objFromOutside, "from outside");
+const printToString = function() {
+    console.log(this.toString());
+}
 
+flo.addEventHandler("print", () => {console.log(this.toString())});
+flo.addEventHandler("print", printToString);
+max.addEventHandler("print", printToString)
+
+// All callback functions of flo as listener for event print will be removed 
+flo.removeFormEvent("print");
+
+max.fireEvent("print");
+// Output to console:
+// max with the age of 88
 
 
 

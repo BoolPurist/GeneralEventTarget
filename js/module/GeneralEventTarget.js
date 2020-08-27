@@ -315,7 +315,8 @@ class GeneralEventTarget {
      * if false the reference of the object which fired the event, is returned for channing
      * @param {!Array<any>} argsCallbackFunction - collection of arguments for every invocated callback function
      */
-    static _triggerEvent(publisher ,eventType, returnCallbackData, argsCallbackFunction) {
+    static _triggerEvent(publisher ,eventType, returnCallbackData, argsCallbackFunction) {        
+        
         let listeners = GeneralEventTarget._eventPool.get(eventType);
         
         // if the event type was not introduced by any listener so far, no need to go further
@@ -323,15 +324,20 @@ class GeneralEventTarget {
 
             // Object to given as parameter for an invocation of a callback function
             // the callback function gets certain information this way
-            const eventObj = new GeneralEvent(eventType, publisher, argsCallbackFunction);           
+            const eventObj = new GeneralEvent(eventType, publisher, argsCallbackFunction);
+            GeneralEventTarget._propagateEventFurther = true;           
             // Checks if it is desired to return a map as information about the returns results 
             // of all invocated callback function.
             if (returnCallbackData === false) {
                 for (const [listener, callbackFunctionList] of listeners) {
                     callbackFunctionList.forEach(callbackFunction => {                            
-                            // Using call for enabling the use of this keyword as 
-                            // reference to the listener itself in a callback function
-                            callbackFunction.call(listener, eventObj);                    
+                            if (GeneralEventTarget._propagateEventFurther !== false) {
+                                // Using call for enabling the use of this keyword as 
+                                // reference to the listener itself in a callback function
+                                callbackFunction.call(listener, eventObj); 
+                            } else {
+                                return null;
+                            }
                         }
                     );                                           
                 }
@@ -349,9 +355,13 @@ class GeneralEventTarget {
                     returnResults.set(listener, resultList);
                     callbackFunctionList.forEach( 
                         (callbackFunction) => {
-                            resultList.push(
-                                callbackFunction.call(listener, eventObj)
-                            );
+                            if ( GeneralEventTarget._propagateEventFurther !== false) {
+                                resultList.push(
+                                    callbackFunction.call(listener, eventObj)
+                                );
+                            } else {
+                                return returnResults;
+                            }
                         }
                     );                                           
                 }
@@ -362,6 +372,8 @@ class GeneralEventTarget {
         } else return null;
         // No matching event type found for the fired event 
     }
+
+    
 
     /**
      * Serves as guard clause against an illegal callbackFunction parameter
@@ -403,6 +415,16 @@ class GeneralEventTarget {
  * @type {Map<!string, Map<object, Array<Function> >>}
  */
 GeneralEventTarget._eventPool = new Map();
+/**
+ * Internal state for letting an event object change it to false
+ * for stopping the execution of the rest of callback function
+ * for a fired event. Will be reset to true after the event
+ * 
+ * @ignore
+ * @static
+ * @type {!boolean}
+ */
+GeneralEventTarget._propagateEventFurther = true;
 
 /**
  * Every invocated callback function is provided with a general event instance as an argument.  
@@ -443,6 +465,7 @@ class GeneralEvent {
          * for callback functions which work with arguments.
          * 
          * List can be empty if the publisher has not provided anything as arguments.
+         * You can use 
          * 
          * In case you want to alter the values in the scope 
          * of the callback function,  It recommended to use 
@@ -460,6 +483,16 @@ class GeneralEvent {
         this.hasArgs = this.args !== null && args.length !== 0;
         // To prevent bugs in case some callback function would try to change the object 
         Object.freeze(this);
+    }
+
+    /**
+     * if used in a callback function, rest of callback functions 
+     * for the fired event will not be invocated
+     * 
+     * @returns {void}
+     */
+    stopPropagationEvent() {
+        GeneralEventTarget._propagateEventFurther = false;
     }
 
 

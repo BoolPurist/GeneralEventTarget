@@ -1,5 +1,19 @@
 # How-To with code examples
 
+## Table of content
+
+---
+
+<a href="#Attaching-and-firing-events">Attaching and firing events</a>
+
+<a href="#Return-values-from-callback-functions">Return values from callback functions</a>
+
+<a href="#Fire-an-event-outside-system">Fire an event with an object which does not inherit from GeneralEventTarget</a
+
+<a href="#Removal-of-callback-functions-And-listener">Removal of callback functions/listener</a>
+
+---
+
 It is assumed that you use instances of a class which extends
 the class GeneralEventTarget
 
@@ -15,9 +29,10 @@ class Person extends GeneralEventTarget {
 }
 ```
 
-## Attaching events and callback functions and trigger the callfunktion by firing the event
+## <a id="Attaching-and-firing-events">Attaching and firing events</a>
 
-Simple example
+Simple example for adding a event handler and then fire the event to execute the callback function
+attached via addEventHandler.
 
 ```javascript
 // animal and person extend the GeneralEventTarget
@@ -31,8 +46,8 @@ const animal = new Animal();
 animal.fireEvent("click");
 ```
 
-Example of the usage of the general event object provided by the module provided for every callback function
-Here are the following properties of the event object in action:
+Example of the usage of the general event object provided by the module provided for every callback function.
+Here are the following properties of the event object used:
 
 - event.publisher: Reference to the publisher of the event  
 - event.args: Array of arguments provided by the publisher via the rest parameter in the function fireEvent
@@ -108,7 +123,7 @@ police.fireEvent("check", 21, "May enjoy having a bottle of beer", "Is not allow
 police.fireEvent("check", 16, "May enjoy having a bottle of beer", "Is not allowed to drink beer");
 ```
 
-## Get return values of all invocated callback functions
+## <a id="Return-values-from-callback-functions">Return values from callback functions</a>
 
 > You can also work with callback functions which return something.
 > The function fireEventReturn can help here.
@@ -146,7 +161,7 @@ printData(allNamesInMap.get(flo)); // Flo with the age of 12, (Is not mature)
 printData(allNamesInMap.get(anna)); // Anna with the age of 45, (Is mature)
 ```
 
-## Fire an event with an object which does not inherit from GeneralEventTarget
+## <a id="Fire-an-event-outside-system"> Fire an event with an object which does not inherit from GeneralEventTarget</a>
 
 Sometimes you want to fire an event but an instance is not part of the
 this event system like a dom element in browser environment. There are
@@ -173,3 +188,69 @@ GeneralEventTarget.fireEventOut(objFromOutside, "from outside");
 > then use "fireEventReturnOut". Object from outside the event system are not meant to be
 > introduced as listeners
 
+## <a id="Removal-of-callback-functions-And-listener">Removal of callback functions/listener</a>
+
+**Removal of a callback functions of a listener for an event type**:
+
+You can remove a callback function from a listener for an given event type
+by using the function removeEventHandler.
+
+> Important: You need a reference to the function to be removed. This can be either the name of
+> a named function or like in the example the name of an variable as a function expression.
+> If you added an anonymous function as callback function without any reference stored in variable
+> you can not remove it individually. To remove it you need use GeneralEventTarget.clearAll,
+> GeneralEventTarget.clearEvent or this.removeFormEvent  
+
+**Explanation of the other ways for the removal of callback function**:
+
+- GeneralEventTarget.clearAll: Will reset the whole event system so all listeners with their
+callback functions are removed completely.
+- GeneralEventTarget.clearEvent: Will remove all listener with their callback function under
+a given event type
+- this.removeFromEvent: listener as the instance will be removed
+with its callback functions for the given event type
+
+```javascript
+const max = new Person("max", 13);
+const flo = new Person("flo", 18);
+const anna = new Person("anna", 21);
+
+const printToString = function() {
+    console.log(this.toString());
+}
+
+max.addEventHandler("print", printToString);
+flo.addEventHandler("print", printToString);
+anna.addEventHandler("print", printToString);
+
+// The callback functions for flo will not be invocated
+// because it was removed from the system
+flo.removeEventHandler("print", printToString);
+
+max.fireEvent("print");
+// Output to console:
+// max with the age of 13
+// anna with the age of 21
+```
+
+**Example with removing all callback functions of a listener for one event type**:
+
+```javascript
+const max = new Person("max", 88);
+const flo = new Person("flo", 18);
+
+const printToString = function() {
+    console.log(this.toString());
+}
+
+flo.addEventHandler("print", () => {console.log(this.toString())});
+flo.addEventHandler("print", printToString);
+max.addEventHandler("print", printToString)
+
+// All callback functions of flo as listener for event print will be removed
+flo.removeFormEvent("print");
+
+max.fireEvent("print");
+// Output to console:
+// max with the age of 88
+```
