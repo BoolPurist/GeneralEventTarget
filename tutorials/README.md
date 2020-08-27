@@ -7,8 +7,7 @@ See the [How-To]{@tutorial How-To} for using the module
 
 ## Purpose
 
-On the client side in javascript's event system only works on dom element. This event system will is used
+On the client side the javascript event system only works on dom elements. This event system is used
 for normal javascript objects.
 
-But the main reason is for the creation of this module is having implemented an own event system to get a better understanding for
-events in general in programming environment
+The implementation of this module as an own event system grants better understanding about event system in javascript
