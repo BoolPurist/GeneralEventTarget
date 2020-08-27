@@ -511,7 +511,7 @@ Testing class GeneralEventTarget
 
     describe(
         `
-        Testing function hasEventTyp
+        Testing function hasEventType
         `, () => {
 
             test.each(invalidEventTypeList)(
@@ -520,7 +520,7 @@ Testing class GeneralEventTarget
                 `, (invalidEventType) => {
                     const person  = new TestPerson();
                     const actualInvocation = () => {
-                        person.hasEventTyp(invalidEventType);
+                        person.hasEventType(invalidEventType);
                     }
 
                     expect(actualInvocation).toThrow(TypeError);
@@ -532,7 +532,7 @@ Testing class GeneralEventTarget
                 Should return false if there is no event type in the system yet 
                 `, () => {
                     const person = new TestPerson();
-                    const actualReturn = GeneralEventTarget.hasEventTyp("click");
+                    const actualReturn = GeneralEventTarget.hasEventType("click");
                     expect(actualReturn).toBe(false);
                 }
             )
@@ -561,7 +561,7 @@ Testing class GeneralEventTarget
 
                     }
 
-                    expect(GeneralEventTarget.hasEventTyp(eventToCheck))
+                    expect(GeneralEventTarget.hasEventType(eventToCheck))
                     .toBe(expectedResult);
                 }
             );

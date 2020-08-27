@@ -7,7 +7,9 @@
     "test": "jest",
     "start": "run-p liveServer sass",
     "liveServer": "live-server",
-    "sass": "sass --watch sass:css"
+    "sass": "sass --watch sass:css",
+    "jsdocBuild": "jsdoc js/module/GeneralEventTarget.js -c conf.jsdoc.json",
+    "jsdocInspect": "live-server docs"
   },
   "keywords": [],
   "author": "BoolPurist",
@@ -19,6 +21,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",
     "@babel/preset-env": "^7.11.0",
     "jest": "^26.4.0",
+    "jsdoc": "^3.6.5",
     "live-server": "^1.2.1",
     "npm-run-all": "^4.1.5",
     "sass": "^1.26.10"

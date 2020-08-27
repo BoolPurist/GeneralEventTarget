@@ -12,9 +12,14 @@ window.addEventListener("DOMContentLoaded",() => {
 const obj = {name: "Hello", id: 2};
 
 const person = new TestPerson("Flo");
-
+const person2 = new TestPerson("Max");
+person2.addEventHandler("click", () => {});
+person2.addEventHandler("focus", () => {});
 
 person.addEventHandler("click", (e) => {
+    let [word1, word2] = e.args;
+    word1 = "Bye"
+    console.log(word1 + word2);
     console.log(`e.publisher.name: ${e.publisher.name}`);
     return true;
 }).addEventHandler("click", (e) => {
@@ -22,7 +27,9 @@ person.addEventHandler("click", (e) => {
     return true;
 })
 
-console.log(GeneralEventTarget.fireEventReturnOut(obj, "click"));
+console.log(GeneralEventTarget._eventPool);
+
+console.log(GeneralEventTarget.fireEventReturnOut(obj, "click", "Hello", " World"));
 
 
 

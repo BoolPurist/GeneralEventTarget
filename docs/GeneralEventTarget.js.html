@@ -1,4 +1,32 @@
-// @ts-check
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: GeneralEventTarget.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: GeneralEventTarget.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// @ts-check
 
 /** @module GeneralEventTarget */
 
@@ -145,7 +173,7 @@ class GeneralEventTarget {
      *  
      * @param {!string} eventType - type of fired event which causes the 
      * execution of the attached callbacktion 
-     * @param  {...any} [argsCallbackFunction] - <optional> parameters for a callback function
+     * @param  {...any} [argsCallbackFunction] - &lt;optional> parameters for a callback function
      * to access through the event object
      * @returns {!object} returns itself for channing
      * @throws {TypeError} Throws if the parameter eventType is 
@@ -171,7 +199,7 @@ class GeneralEventTarget {
      * execution of the attached callback functions to all listeners of the event type 
      * @param  {...any} [argsCallbackFunction] - (optional) parameters for a callback function
      * to access through the event object
-     * @returns {?Map<object,Array<any>>} - It returns null if there is no listener for 
+     * @returns {?Map&lt;object,Array&lt;any>>} - It returns null if there is no listener for 
      * the fired event . 
      * It returns a map with keys as references to the listeners which reacted to the fired event. A key
      * maps to a list of the return values of the executed callback function of the respective listener.
@@ -215,7 +243,7 @@ class GeneralEventTarget {
      * functions
      * @param  {...any} [argsCallbackFunction] - argument provided for every callback function
      * invoked by the fired event
-     * @returns {?Map<object,Array<any>>} -  It returns a map with keys 
+     * @returns {?Map&lt;object,Array&lt;any>>} -  It returns a map with keys 
      * as references to the listeners which reacted to the fired event. A key maps to a list of 
      * the return values of the executed callback function of the respective listener.
      * If there are no listeners of the given event type, It returns null 
@@ -277,7 +305,7 @@ class GeneralEventTarget {
      
      * @static
      * @param {!string} eventType - type of events the listeners reacts to
-     * @returns {Iterator<!string>} yields all introduced event types
+     * @returns {Iterator&lt;!string>} yields all introduced event types
      * @throws {TypeError} Throws if the parameter eventType is 
      * not a non-empty string 
      */
@@ -296,7 +324,7 @@ class GeneralEventTarget {
      * 
      * @readonly
      * @static
-     * @type {IterableIterator<?string>}
+     * @type {IterableIterator&lt;?string>}
      */
     static get eventTypes() {
         return GeneralEventTarget._eventPool.keys();
@@ -313,7 +341,7 @@ class GeneralEventTarget {
      * @param {!boolean} returnCallbackData - if true an Map with keys of references to the listeners which reacted
      * and values to a list of returns values
      * if false the reference of the object which fired the event, is returned for channing
-     * @param {!Array<any>} argsCallbackFunction - collection of arguments for every invocated callback function
+     * @param {!Array&lt;any>} argsCallbackFunction - collection of arguments for every invocated callback function
      */
     static _triggerEvent(publisher ,eventType, returnCallbackData, argsCallbackFunction) {
         let listeners = GeneralEventTarget._eventPool.get(eventType);
@@ -400,7 +428,7 @@ class GeneralEventTarget {
  * 
  * @ignore
  * @static
- * @type {Map<!string, Map<object, Array<Function> >>}
+ * @type {Map&lt;!string, Map&lt;object, Array&lt;Function> >>}
  */
 GeneralEventTarget._eventPool = new Map();
 
@@ -422,7 +450,7 @@ class GeneralEvent {
      * fired one instance is used for all invocated callback function. 
      * 
      * @param {!object} publisher - reference to the object which fired the event 
-     * @param {?Array<any>} [args=null] - arguments which will be accessible for a callback function
+     * @param {?Array&lt;any>} [args=null] - arguments which will be accessible for a callback function
      */
     constructor(eventType ,publisher, args=null) {        
         
@@ -448,7 +476,7 @@ class GeneralEvent {
          * of the callback function,  It recommended to use 
          * deconstructing to assign the arguments to new variables  
          * 
-         * @type {Array<any>}
+         * @type {Array&lt;any>}
          */
         this.args = args;        
         /**
@@ -457,7 +485,7 @@ class GeneralEvent {
          * 
          * @type {!boolean}
          */
-        this.hasArgs = this.args !== null && args.length !== 0;
+        this.hasArgs = this.args !== null &amp;&amp; args.length !== 0;
         // To prevent bugs in case some callback function would try to change the object 
         Object.freeze(this);
     }
@@ -484,4 +512,26 @@ function throwForInValidEventType(eventType) {
 
 export  { 
     GeneralEventTarget
-};
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-GeneralEventTarget.html">GeneralEventTarget</a></li></ul><h3>Classes</h3><ul><li><a href="module-GeneralEventTarget-GeneralEvent.html">GeneralEvent</a></li><li><a href="module-GeneralEventTarget-GeneralEventTarget.html">GeneralEventTarget</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Thu Aug 27 2020 11:45:21 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
