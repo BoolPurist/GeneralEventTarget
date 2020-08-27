@@ -56,10 +56,14 @@ class GeneralEventTarget {
         return this;
     }
     /**
+     * Removes the specified callback function under the given event type for
+     * this listener if it was added before
      * 
      * @param {!string} eventType 
      * @param {!Function} callbackFunction
-     * @returns {*} returns instance self for channings 
+     * @returns {*} returns instance self for channing
+     * @throws {TypeError} Throws if the parameter eventType is 
+     * not a non-empty string or the parameter callbackFunction is not a function 
      */
     removeEventHandler(eventType, callbackFunction) {
         throwForInValidEventType(eventType);
@@ -86,11 +90,23 @@ class GeneralEventTarget {
     }
     /**
      * 
-     * @param {!string} eventType  
-     * @returns {void}     
+     * 
+     * @param {!string} eventType - Under which type of event all callback
+     * functions for this listeners should be removed 
+     * @returns {*} returns itself for channing 
+     * @throws {TypeError} Throws if the parameter eventType is 
+     * not a non-empty string    
      */
-    removeEvent(eventType) {
+    removeFormEvent(eventType) {
+        throwForInValidEventType(eventType);
 
+        const listeners = GeneralEventTarget._eventPool.get(eventType);
+
+        if (typeof listeners !== "undefined") {
+            listeners.delete(this);
+        }
+
+        return this;
     }
 
 
@@ -119,13 +135,13 @@ class GeneralEventTarget {
      * It also returns a map for inspect the return values of the callback function invocation.
      * 
      * @param {!string} eventType - type of fired event which causes the 
-     * execution of the attached callbacktion 
-     * @param  {...any} [argsCallbackFunction] - <optional> parameters for a callback function
+     * execution of the attached callback functions to all listeners of the event type 
+     * @param  {...any} [argsCallbackFunction] - (optional) parameters for a callback function
      * to access through the event object
      * @returns {?Map<object,Array<any>>} - It returns null if there is no listener for 
-     * the fired event yet. 
+     * the fired event . 
      * It returns a map with keys as references to the listeners which reacted to the fired event. A key
-     * maps to a list of the return values of the executed callback function of that listener.
+     * maps to a list of the return values of the executed callback function of the respective listener.
      * @throws {TypeError} Throws if the parameter eventType is 
      * not a non-empty string 
      */
@@ -247,16 +263,16 @@ class GeneralEventTarget {
 
     /**
      * @readonly
-     * @type {IterableIterator<?string>}
+     * @type {IterableIterator<?string>} - yields all introduced event types
      */
     static get eventTypes() {
         return GeneralEventTarget._eventPool.keys();
     }
 
     /**
-     * Gets all event types which listeners listen to 
+     * Gets all event types which listeners listen to.
      * 
-     * @param {!string} eventType - type of events the listeners listens to
+     * @param {!string} eventType - type of events the listeners reacts to
      * @returns {Iterator<!string>} yields the all introduced event types
      * @throws {TypeError} Throws if the parameter eventType is 
      * not a non-empty string 
@@ -270,6 +286,7 @@ class GeneralEventTarget {
         
     }
 
+    // Used in functions to validate a callback function as parameter
     static _throwForInValidCallBackFunction(callbackFunction) {
         let desiredType = "function";
         if (callbackFunction === null || typeof callbackFunction !== desiredType) throw TypeError(

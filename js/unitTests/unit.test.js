@@ -395,7 +395,7 @@ Testing class GeneralEventTarget
                 ]
             ])(
                 `
-                Should invoke a function which changes a object value to %i %o
+                Should invoke a function which changes a object value to %i
                 `, (expectedResult, fireEventScenarioList) => {
                     doAddingEventHandlers(fireEventScenarioList);
                     doFiring(fireEventScenarioList);
@@ -441,6 +441,29 @@ Testing class GeneralEventTarget
                 }
             )
         
+            const expectedResultsForReturn = [10, "result", true];
+            test(
+                `
+                Should return a map <persons[0], ${expectedResultsForReturn}> 
+                after firing an event
+                `, () => {
+                    const resultMap  = persons[0].addEventHandler("click", () => { return 10})
+                    .addEventHandler("click", () => { return "result"})
+                    .addEventHandler("click", () => { return true})
+                    .fireEventReturn("click");
+
+                    const resultListForPerson0 = resultMap.get(persons[0]);
+                    
+                
+                    for (let i = 0; i < resultListForPerson0.length; i++) {
+                        expect(resultListForPerson0[i])
+                        .toBe(expectedResultsForReturn[i]);
+                    }
+                    
+                }
+            );
+
+
         }
     )
 
@@ -656,6 +679,11 @@ Testing class GeneralEventTarget
 
     function changeByArgue(event) {
         obj.value += event.args[0]; 
+    }
+
+    // Provide a callback function which returns something
+    function returnFix20() {
+        return 20;
     }
 
 

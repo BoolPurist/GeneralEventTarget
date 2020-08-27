@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose",
+    "test": "jest",
     "start": "run-p liveServer sass",
     "liveServer": "live-server",
     "sass": "sass --watch sass:css"

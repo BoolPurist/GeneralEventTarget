@@ -10,11 +10,12 @@ window.addEventListener("DOMContentLoaded",() => {
 const person = new TestPerson("Florian");
 
 person.addEventHandler("click", click);
-person.addEventHandler("click", press);
+person.addEventHandler("press", press);
+person.addEventHandler("press", () => {console.log("Hello from any press")});
 const any = () => {
     console.log("Hello from any");
 };
-person.addEventHandler("click", any).removeEventHandler("click", any).fireEvent("click");
+person.removeFormEvent("click").fireEvent("press").fireEvent("click");
 
 
 function click() {
