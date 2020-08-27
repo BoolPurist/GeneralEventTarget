@@ -1,5 +1,5 @@
 import { 
-    GeneralEventTarget, GeneralEvent, CallbackReport, CallbackInvocation 
+    GeneralEventTarget 
 }  from "./module/GeneralEventTarget.js";
 
 import { TestPerson } from "./module/TestPerson.js"
@@ -7,18 +7,23 @@ import { TestPerson } from "./module/TestPerson.js"
 
 window.addEventListener("DOMContentLoaded",() => {
 
-let name = (function() {
-    let name = "";
+const person = new TestPerson("Florian");
 
-    return function(newName)  {
-        if (newName !== null && typeof newName === "string") {
-            name = newName;
-        }
-        return name;
-    }
-})();
+person.addEventHandler("click", click);
+person.addEventHandler("click", press);
+const any = () => {
+    console.log("Hello from any");
+};
+person.addEventHandler("click", any).removeEventHandler("click", any).fireEvent("click");
 
-console.log(name());
+
+function click() {
+    console.log("Hello from click");
+}
+
+function press() {
+    console.log("Hello from press");
+}
 
 });
 
