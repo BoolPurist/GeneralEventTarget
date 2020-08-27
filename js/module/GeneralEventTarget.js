@@ -124,7 +124,7 @@ class GeneralEventTarget {
      */
     fireEvent(eventType, ...argsCallbackFunction) {
         throwForInValidEventType(eventType);
-        this._triggerEvent(eventType, false, argsCallbackFunction);
+        GeneralEventTarget._triggerEvent(this ,eventType, false, argsCallbackFunction);
         return this;        
     }
 
@@ -147,12 +147,130 @@ class GeneralEventTarget {
      */
     fireEventReturn(eventType, ...argsCallbackFunction) {
         throwForInValidEventType(eventType);
-        return this._triggerEvent(eventType, true, argsCallbackFunction);
+        return GeneralEventTarget._triggerEvent(this,eventType, true, argsCallbackFunction);
+    }
+
+    /**
+     * Enables an object which does not inherit from GeneralEventTarget to fire
+     * an event for listeners of GeneralEventTarget  
+     * 
+     * @static
+     * @param {!object} publisher - object which is fires the event
+     * @param {!string} eventType - To determine which listeners shall execute the 
+     * their the callback function
+     * @param  {...any} [argsCallbackFunction] - argument provided for every callback function
+     * invoked by the fired event
+     * @returns {void} 
+     * @throws {TypeError} 
+     * Throws if the parameter publisher is not an object
+     * Throws if the parameter eventType is not a non-empty string
+     */
+    static fireEventOut(publisher, eventType, ...argsCallbackFunction) {
+        GeneralEventTarget._throwForInValidPublisher(publisher);
+        throwForInValidEventType(eventType);
+        GeneralEventTarget._triggerEvent(publisher, eventType, false, argsCallbackFunction);
+    }
+
+    /**
+     * Enables an object which does not inherit from GeneralEventTarget to fire
+     * an event for listeners of GeneralEventTarget. It give back a map to inspect the
+     * return values of all callback functions triggered by the event   
+     * 
+     * @static
+     * @param {!object} publisher - object which is fires the event
+     * @param {!string} eventType - To determine which listeners shall execute the 
+     * their the callback function
+     * @param  {...any} [argsCallbackFunction] - argument provided for every callback function
+     * invoked by the fired event
+    * @returns {?Map<object,Array<any>>} - It returns null if there is no listener for 
+     * the fired event . 
+     * It returns a map with keys as references to the listeners which reacted to 
+     * the fired event. A key maps to a list of the return 
+     * values of the executed callback function of the respective listener.
+     * @throws {TypeError} 
+     * Throws if the parameter publisher is not an object
+     * Throws if the parameter eventType is not a non-empty string
+     */
+    static fireEventReturnOut(publisher, eventType, ...argsCallbackFunction) {
+        GeneralEventTarget._throwForInValidPublisher(publisher);
+        throwForInValidEventType(eventType);
+        return (
+            GeneralEventTarget._triggerEvent(publisher, eventType, true, argsCallbackFunction)
+        );
+    }
+
+    /**
+     * Removes an event type so all callback functions attached to this
+     * event are now forgotten
+     * 
+     * @param {!string} eventType
+     * @returns {!boolean} true if the an event type was deleted 
+     * or false if it was not there in the first place
+     * @throws {TypeError} Throws if the parameter eventType is 
+     * not a non-empty string 
+     */
+    static clearEvent(eventType) {
+        throwForInValidEventType(eventType)
+        return GeneralEventTarget._eventPool.delete(eventType);
+    }
+
+    /**
+     * Takes all event types out of the system.
+     * So no listeners are registered anymore.
+     * 
+     * @static 
+     * @returns {void}
+     */
+    static clearAll() {
+        GeneralEventTarget._eventPool.clear();
+    }
+
+    /**
+     * Tells if an event type was already introduced
+     * 
+     * @static
+     * @param {!string} eventType - type of an event
+     * @returns {!boolean} - true if the event type has listeners
+     * false if the event type has not listeners yet
+     * @throws {TypeError} Throws if the parameter eventType is 
+     * not a non-empty string       
+     */
+    static hasEventTyp(eventType) {
+        throwForInValidEventType(eventType);
+        return GeneralEventTarget._eventPool.has(eventType);
+    }
+
+    /**
+     * Gets all event types which listeners listen to.
+     
+     * @static
+     * @param {!string} eventType - type of events the listeners reacts to
+     * @returns {Iterator<!string>} yields the all introduced event types
+     * @throws {TypeError} Throws if the parameter eventType is 
+     * not a non-empty string 
+     */
+    static getListeners(eventType) {
+        throwForInValidEventType(eventType);         
+        const listeners = GeneralEventTarget._eventPool.get(eventType);
+
+        if (typeof listeners === "undefined" ) return null;
+        else return listeners.keys();
+        
+    }
+
+
+    /**
+     * @readonly
+     * @static
+     * @type {IterableIterator<?string>} - yields all introduced event types
+     */
+    static get eventTypes() {
+        return GeneralEventTarget._eventPool.keys();
     }
 
     // Fires an event with a given event type to trigger all callback functions of
     // the listeners for that type. 
-    _triggerEvent(eventType, returnCallbackData = false, argsCallbackFunction) {
+    static _triggerEvent(publisher ,eventType, returnCallbackData = false, argsCallbackFunction) {
         let listeners = GeneralEventTarget._eventPool.get(eventType);
         
         // if the event type was not introduced by any listener so far, no need to go further
@@ -160,7 +278,7 @@ class GeneralEventTarget {
 
             // Object to given as parameter for an invocation of a callback function
             // the callback function gets certain information this way
-            const eventObj = new GeneralEvent(eventType, this, argsCallbackFunction); 
+            const eventObj = new GeneralEvent(eventType, publisher, argsCallbackFunction); 
             // To prevent bugs in case some callback function would try to change the object           
             Object.freeze(eventObj);
             // Is it desired return a map for the return values of the callback function
@@ -200,92 +318,6 @@ class GeneralEventTarget {
         // No matching event type found for the fired event 
     }
 
-    /**
-     * 
-     * @param {!object} publisher 
-     * @param {!string} eventType 
-     * @param {!boolean} [returnCallbackData=false] 
-     * @param  {...any} [argsCallbackFunction]
-     * @returns {void|GeneralEvent} 
-     */
-    static fireEventOut(publisher, eventType, returnCallbackData = false, ...argsCallbackFunction) {
-
-    }
-
-    /**
-     * 
-     * @param {object} eventTarget
-     * @returns {void} 
-     */
-    static injectAsEventTarget(eventTarget) {
-
-    }
-
-    /**
-     * Removes an event type so all callback functions attached to this
-     * event are now forgotten
-     * 
-     * @param {!string} eventType
-     * @returns {!boolean} true if the an event type was deleted 
-     * or false if it was not there in the first place
-     * @throws {TypeError} Throws if the parameter eventType is 
-     * not a non-empty string 
-     */
-    static clearEvent(eventType) {
-        throwForInValidEventType(eventType)
-        return GeneralEventTarget._eventPool.delete(eventType);
-    }
-
-    /**
-     * Takes all event types out of the system.
-     * So no listeners are registered anymore.
-     * 
-     * @static 
-     * @returns {void}
-     */
-    static clearAll() {
-        GeneralEventTarget._eventPool.clear();
-    }
-
-    /**
-     * Tells if an event type was already introduced
-     * 
-     * @param {!string} eventType - type of an event
-     * @returns {!boolean} - true if the event type has listeners
-     * false if the event type has not listeners yet
-     * @throws {TypeError} Throws if the parameter eventType is 
-     * not a non-empty string       
-     */
-    static hasEventTyp(eventType) {
-        throwForInValidEventType(eventType);
-        return GeneralEventTarget._eventPool.has(eventType);
-    }
-
-    /**
-     * @readonly
-     * @type {IterableIterator<?string>} - yields all introduced event types
-     */
-    static get eventTypes() {
-        return GeneralEventTarget._eventPool.keys();
-    }
-
-    /**
-     * Gets all event types which listeners listen to.
-     * 
-     * @param {!string} eventType - type of events the listeners reacts to
-     * @returns {Iterator<!string>} yields the all introduced event types
-     * @throws {TypeError} Throws if the parameter eventType is 
-     * not a non-empty string 
-     */
-    static getListeners(eventType) {
-        throwForInValidEventType(eventType);         
-        const listeners = GeneralEventTarget._eventPool.get(eventType);
-
-        if (typeof listeners === "undefined" ) return null;
-        else return listeners.keys();
-        
-    }
-
     // Used in functions to validate a callback function as parameter
     static _throwForInValidCallBackFunction(callbackFunction) {
         let desiredType = "function";
@@ -294,6 +326,11 @@ class GeneralEventTarget {
         );
     }
 
+    static _throwForInValidPublisher(publisher) {
+        if (publisher === null || typeof publisher !== "object") {
+            throw new TypeError("publisher must be an object !");
+        }
+    }
 }
 
 

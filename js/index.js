@@ -7,15 +7,24 @@ import { TestPerson } from "./module/TestPerson.js"
 
 window.addEventListener("DOMContentLoaded",() => {
 
-const person = new TestPerson("Florian");
 
-person.addEventHandler("click", click);
-person.addEventHandler("press", press);
-person.addEventHandler("press", () => {console.log("Hello from any press")});
-const any = () => {
-    console.log("Hello from any");
-};
-person.removeFormEvent("click").fireEvent("press").fireEvent("click");
+
+const obj = {name: "Hello", id: 2};
+
+const person = new TestPerson("Flo");
+
+
+person.addEventHandler("click", (e) => {
+    console.log(`e.publisher.name: ${e.publisher.name}`);
+    return true;
+}).addEventHandler("click", (e) => {
+    console.log(`e.publisher.name: ${e.publisher.name}`);
+    return true;
+})
+
+console.log(GeneralEventTarget.fireEventReturnOut(obj, "click"));
+
+
 
 
 function click() {

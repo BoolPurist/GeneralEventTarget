@@ -469,6 +469,48 @@ Testing class GeneralEventTarget
 
     describe(
         `
+        Testing function GeneralEventTarget.fireEventOut
+        `, () => {
+
+            test.each([
+                null, 
+                2, 
+                "string",
+                false,
+            ])(
+                `
+                Should throw TypeError because of this "%o" as 
+                invalid publisher param
+                `, (invalidPublisher) => {
+                    const actualInvocation = () => {                        
+                        GeneralEventTarget.fireEventOut(
+                            invalidPublisher, "click"
+                        );
+                    }
+
+                    expect(actualInvocation).toThrow(TypeError);
+                }
+            );
+
+            test.each(invalidEventTypeList)(
+                `
+                Should throw TypeError because of this "%o" as
+                invalid event type param
+                `, (invalidEventType) => {
+                    const actualInvocation = () => {                        
+                        GeneralEventTarget.fireEventOut(
+                            {}, invalidEventType
+                        );
+                    }
+
+                    expect(actualInvocation).toThrow(TypeError);
+                }
+            )
+        }
+    )
+
+    describe(
+        `
         Testing function hasEventTyp
         `, () => {
 
