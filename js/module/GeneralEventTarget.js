@@ -442,7 +442,7 @@ class GeneralEvent {
          * Arbitrary values as arguments in a list provided by the publisher 
          * for callback functions which work with arguments.
          * 
-         * List can be empty if the publisher has not provide any.
+         * List can be empty if the publisher has not provided anything as arguments.
          * 
          * In case you want to alter the values in the scope 
          * of the callback function,  It recommended to use 

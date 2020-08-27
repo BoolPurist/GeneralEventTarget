@@ -4,43 +4,43 @@ import {
 
 import { TestPerson } from "./module/TestPerson.js"
 
+class Animal extends GeneralEventTarget {
+    constructor(name) {
+        super();
+        this.name = name;
+        
+    }
+}
+
+class Person extends GeneralEventTarget {
+    constructor(name, age) {
+        super();
+        this.name = name;
+        this.age = age;
+        this.nameOfPet = "Has no pet";
+    }
+
+    toString() {
+        return `${this.name} with the age of ${this.age}`;
+    }
+}
 
 window.addEventListener("DOMContentLoaded",() => {
 
+const person = new Person("Flo", 21);
 
+person.addEventHandler("from outside", function (event) {
+    // event.publisher.tagName = div.
+    console.log(`An ${event.publisher.tagName} element triggered me !`);
+});
 
-const obj = {name: "Hello", id: 2};
-
-const person = new TestPerson("Flo");
-const person2 = new TestPerson("Max");
-person2.addEventHandler("click", () => {});
-person2.addEventHandler("focus", () => {});
-
-person.addEventHandler("click", (e) => {
-    let [word1, word2] = e.args;
-    word1 = "Bye"
-    console.log(word1 + word2);
-    console.log(`e.publisher.name: ${e.publisher.name}`);
-    return true;
-}).addEventHandler("click", (e) => {
-    console.log(`e.publisher.name: ${e.publisher.name}`);
-    return true;
-})
-
-console.log(GeneralEventTarget._eventPool);
-
-console.log(GeneralEventTarget.fireEventReturnOut(obj, "click", "Hello", " World"));
+// A div element does not extend the class GeneralEventTarget 
+// So it fires from outside the event system.
+const objFromOutside = document.createElement("div");
+GeneralEventTarget.fireEventOut(objFromOutside, "from outside");
 
 
 
-
-function click() {
-    console.log("Hello from click");
-}
-
-function press() {
-    console.log("Hello from press");
-}
 
 });
 
